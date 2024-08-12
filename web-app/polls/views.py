@@ -176,64 +176,69 @@ def driver_profile(request):
     if driver == 0:
         return redirect('/users/profile')
     if request.method == "GET":
-        return render(request,"driver_profile.html", {'username': ob.username, 'ob':ob})
-    if 'edit_username' in request.POST:
-        name = request.POST.get("username")
-        exist = UserInfo.objects.filter(username = name).exists()
-        if not name:
-            # logger.warning("username cannot be None")
-            return render(request,"driver_profile.html", {'username': ob.username, 'ob':ob,'error_meg':"Username can not be none!"})
-        if exist:
-            # logger.warning("username already exist")
-            return render(request,"driver_profile.html", {'username': ob.username, 'ob':ob, 'error_meg':"Username already exist!"})
-        UserInfo.objects.filter(id = userid).update(username = name)
-        obnew = UserInfo.objects.filter(id = userid).first()
-        return render(request,"driver_profile.html", {'username': obnew.username, 'ob':obnew, 'meg':"Edit Username successfully!"})
-    if 'edit_email' in request.POST:
-        email = request.POST.get("email")
-        if not email:
-            # logger.warning("Email cannot be None")
-            return render(request,"driver_profile.html", {'username': ob.username, 'ob':ob,'error_meg3':"Email can not be none!"})
-        UserInfo.objects.filter(id = userid).update(email = email)
-        obnew = UserInfo.objects.filter(id = userid).first()
-        return render(request,"driver_profile.html", {'username': obnew.username, 'ob':obnew, 'meg5':"Edit email successfully!"})
-    if 'edit_vehicle_type' in request.POST:
-        vehicle_type = request.POST.get("type")
-        if vehicle_type == "Choose your vehicle type":
-            # logger.warning("Vehicle type cannot be None")
-            return render(request,"driver_profile.html", {'username': ob.username, 'ob':ob, 'error_meg1':"Please choose a vehicle type!"})
-        UserInfo.objects.filter(id = userid).update(vehicle_type = vehicle_type)
-        obnew = UserInfo.objects.filter(id = userid).first()
-        return render(request,"driver_profile.html",{'username': obnew.username,'ob':obnew, 'meg1':"Edit vehicle type successfully!"})
-    if 'edit_driver_license' in request.POST:
-        driver_license = request.POST.get("license")
-        if not driver_license:
-            # logger.warning("Driver license cannot be None")
-            return render(request,"driver_profile.html", {'username': ob.username, 'ob':ob,'error_meg4':"Driver license can not be none!"})
-        UserInfo.objects.filter(id = userid).update(driver_license = driver_license)
-        obnew = UserInfo.objects.filter(id = userid).first()
-        return render(request,"driver_profile.html", {'username': obnew.username, 'ob':obnew, 'meg2':"Edit driver license successfully!"})
-    if 'edit_seats_num' in request.POST:
-        seats = request.POST.get("seats")
-        if not seats:
-            # logger.warning("seats cannot be None")
-            return render(request,"driver_profile.html", {'username': ob.username, 'ob':ob,'error_meg5':"Seats number can not be none!"})
-        UserInfo.objects.filter(id = userid).update(seats_num = seats)
-        obnew = UserInfo.objects.filter(id = userid).first()
-        return render(request,"driver_profile.html", {'username': obnew.username, 'ob':obnew, 'meg3':"Edit seats number successfully!"})
-    if 'edit_special_info' in request.POST:
-        info = request.POST.get("info")
-        if not info or info == "":
-            info = "None"
-        UserInfo.objects.filter(id = userid).update(special_info = info)
-        obnew = UserInfo.objects.filter(id = userid).first()
-        
-        return render(request,"driver_profile.html", {'username': obnew.username, 'ob':obnew, 'meg4':"Edit special information successfully!"})
+        return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob})
     
-    if 'cancel' in request.POST:
-        UserInfo.objects.filter(id = userid).update(is_driver = 0, vehicle_type = "",driver_license = 000000000,seats_num = 0, special_info = "")
-        return redirect('/users/profile')
-    return render(request,"driver_profile.html", {'username': ob.username, 'ob':ob})
+    try:
+        if 'edit_username' in request.POST:
+            name = request.POST.get("username")
+            if not name:
+                return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob, 'error_meg': "Username cannot be None!"})
+            if UserInfo.objects.filter(username=name).exists():
+                return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob, 'error_meg': "Username already exists!"})
+            UserInfo.objects.filter(id=userid).update(username=name)
+            obnew = UserInfo.objects.filter(id=userid).first()
+            return render(request, "driver_profile.html", {'username': obnew.username, 'ob': obnew, 'meg': "Edit Username successfully!"})
+        
+        if 'edit_email' in request.POST:
+            email = request.POST.get("email")
+            if not email:
+                return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob, 'error_meg3': "Email cannot be None!"})
+            UserInfo.objects.filter(id=userid).update(email=email)
+            obnew = UserInfo.objects.filter(id=userid).first()
+            return render(request, "driver_profile.html", {'username': obnew.username, 'ob': obnew, 'meg5': "Edit email successfully!"})
+
+        if 'edit_vehicle_type' in request.POST:
+            vehicle_type = request.POST.get("type")
+            if vehicle_type == "Choose your vehicle type":
+                return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob, 'error_meg1': "Please choose a vehicle type!"})
+            UserInfo.objects.filter(id=userid).update(vehicle_type=vehicle_type)
+            obnew = UserInfo.objects.filter(id=userid).first()
+            return render(request, "driver_profile.html", {'username': obnew.username, 'ob': obnew, 'meg1': "Edit vehicle type successfully!"})
+
+        if 'edit_driver_license' in request.POST:
+            driver_license = request.POST.get("license")
+            if not driver_license or not driver_license.isdigit():
+                return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob, 'error_meg4': "Driver license must be a number!"})
+            UserInfo.objects.filter(id=userid).update(driver_license=driver_license)
+            obnew = UserInfo.objects.filter(id=userid).first()
+            return render(request, "driver_profile.html", {'username': obnew.username, 'ob': obnew, 'meg2': "Edit driver license successfully!"})
+
+        if 'edit_seats_num' in request.POST:
+            seats = request.POST.get("seats")
+            if not seats:
+                return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob, 'error_meg5': "Seats number cannot be None!"})
+            UserInfo.objects.filter(id=userid).update(seats_num=seats)
+            obnew = UserInfo.objects.filter(id=userid).first()
+            return render(request, "driver_profile.html", {'username': obnew.username, 'ob': obnew, 'meg3': "Edit seats number successfully!"})
+
+        if 'edit_special_info' in request.POST:
+            info = request.POST.get("info")
+            if not info or info == "":
+                info = "None"
+            UserInfo.objects.filter(id=userid).update(special_info=info)
+            obnew = UserInfo.objects.filter(id=userid).first()
+            return render(request, "driver_profile.html", {'username': obnew.username, 'ob': obnew, 'meg4': "Edit special information successfully!"})
+
+        if 'cancel' in request.POST:
+            UserInfo.objects.filter(id=userid).update(is_driver=0, vehicle_type="", driver_license=000000000, seats_num=0, special_info="")
+            return redirect('/users/profile')
+
+    except Exception as e:
+        # logger.error(f"Error processing request: {e}")
+        return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob, 'error_meg': "An unexpected error occurred!"})
+
+    return render(request, "driver_profile.html", {'username': ob.username, 'ob': ob})
+
 
 
 def driver_create(request):
